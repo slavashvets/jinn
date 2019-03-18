@@ -70,50 +70,23 @@ class Renderer(object):
         output_path.parents[0].mkdir(parents=True, exist_ok=True)
         stream = template.stream(**kwargs)
         stream.dump(fp=str(output_path), errors='strict')
-        
-        # outputText = template.render(**kwargs) 
-        # outputText.
-        # print(outputText)
-
-# def find_dict_path(d, profile):
-#   if profile in d.keys():
-#     return [profile]
-#   for k,v in d.items():
-#     collected_profiles = []
-#     if v is None:
-#       return None
-#     elif isinstance(v, dict):
-#       collected_profiles.append(k)
-#       res = find_dict_path(v, profile)
-#       if res:
-#         collected_profiles.extend(res)
-#         return collected_profiles
 
 class NoProfileException(Exception):
   ...
 
-# def pprint(d):
-#   import pprint
-# >>> stuff = ['spam', 'eggs', 'lumberjack', 'knights', 'ni']
-# >>> stuff.insert(0, stuff[:])
-# >>> pp = pprint.PrettyPrinter(indent=4)
-# >>> pp.pprint(stuff)
-
 def find_dict_keychain(d, target_key):
   """return a list of keys representing the path to target key in the dict
   """
-  if target_key in d.keys():
-    return [target_key]
-  for k,v in d.items():
-    if not v:
-      return None
-    collected = []
-    if isinstance(v, dict):
-      collected.append(k)
-      res = find_dict_keychain(v, target_key)
+  result = []
+  for key, value in d.items():
+    if target_key == key:
+      result = [key]
+      break
+    if isinstance(value, dict):
+      res = find_dict_keychain(value, target_key)
       if res:
-        collected.extend(res)
-        return collected
+        result = [key] + res
+  return result
 
 def build_profiles(path, profile):
   with open(path, 'r') as stream:
@@ -170,7 +143,7 @@ def main():
     exit(0)
 
   renderer = Renderer(args['<path>'], "output")
-  renderer.render(**config, vault=vault_wrapper, sec=vault_client.read)
+  renderer.render(**config, vault=vault_wrapper, profile=args['<profile>'])
 
 if __name__ == "__main__":
   main()
