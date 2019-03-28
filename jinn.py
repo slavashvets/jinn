@@ -1,4 +1,4 @@
-#! /usr/bin/python
+#!/usr/bin/env python
 
 """
 Upd v{version}
@@ -29,7 +29,7 @@ import pathlib
 import yaml
 
 # third-party
-from dict_merge import dict_merge
+from jinnlib.dict_merge import dict_merge
 from docopt import docopt
 from toolz.dicttoolz import merge
 import colorlog
