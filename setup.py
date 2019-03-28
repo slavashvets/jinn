@@ -6,8 +6,6 @@ from setuptools import setup
 setup(name='jinn',
       version='0.1',
       description='Jinn is a simple Jinja-based template processor. Similar to Ansible, but executes locally. Supports inheritance and extension of configs.',
-      long_description=bottle.__doc__,
-      long_description_content_type="text/markdown",
       author='Slava Shvets',
       author_email='vyacheslav.shvets@t-systems.com',
       packages=['jinnlib'],
