@@ -4,7 +4,7 @@ import sys
 from setuptools import setup
 
 setup(name='jinn',
-      version='0.1',
+      version='0.1.1',
       description='Jinn is a simple Jinja-based template processor. Similar to Ansible, but executes locally. Supports inheritance and extension of configs.',
       author='Slava Shvets',
       author_email='vyacheslav.shvets@t-systems.com',
@@ -18,7 +18,8 @@ setup(name='jinn',
         'colorlog',
         'hvac',
         'pyyaml',
-        'toolz'],
+        'toolz',
+        'docopt'],
       classifiers=["Operating System :: OS Independent",
                    'Programming Language :: Python :: 3.5',
                    'Programming Language :: Python :: 3.6',
