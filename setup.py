@@ -3,11 +3,6 @@
 import sys
 from setuptools import setup
 
-if sys.version_info < (2, 7):
-    raise NotImplementedError("Sorry, you need at least Python 2.7 or Python 3.2+ to use bottle.")
-
-import bottle
-
 setup(name='jinn',
       version='0.1',
       description='Jinn is a simple Jinja-based template processor. Similar to Ansible, but executes locally. Supports inheritance and extension of configs.',
