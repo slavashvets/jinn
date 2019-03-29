@@ -48,6 +48,12 @@ __version__ = '0.0.1'
 
 logger = logging.getLogger()
 
+def finalize(value):
+  if value == None:
+    raise Exception("None value is not allowed")
+  else:
+    return value
+
 class Renderer(object):
   def __init__(self, base_path, output_path):
     self.base_path = base_path
@@ -55,6 +61,7 @@ class Renderer(object):
       searchpath="./"
     )
     self.env = jinja2.Environment(
+      finalize=finalize,
       loader=self.loader,
       undefined=jinja2.StrictUndefined,
     )
@@ -143,7 +150,11 @@ def main():
     exit(0)
 
   renderer = Renderer(args['<path>'], "output")
-  renderer.render(**config, vault=vault_wrapper, profile=args['<profile>'])
+  renderer.render(**config,
+    vault=vault_wrapper,
+    profile=args['<profile>'],
+    profiles=profiles,
+  )
 
 if __name__ == "__main__":
   main()
