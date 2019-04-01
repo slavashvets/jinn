@@ -25,6 +25,7 @@ from sys import stdout
 import logging
 import logging.handlers as handlers
 import os
+import stat
 import pathlib
 import yaml
 
@@ -77,6 +78,12 @@ class Renderer(object):
         output_path.parents[0].mkdir(parents=True, exist_ok=True)
         stream = template.stream(**kwargs)
         stream.dump(fp=str(output_path), errors='strict')
+
+        # Inherit executable flag to the output file
+        if os.access(template_file, os.X_OK):
+          logger.debug("Set executable flag to %s" % output_path)
+          st = os.stat(output_path)
+          os.chmod(output_path, st.st_mode | stat.S_IEXEC)
 
 class NoProfileException(Exception):
   ...
