@@ -161,6 +161,7 @@ def main():
     vault=vault_wrapper,
     profile=args['<profile>'],
     profiles=profiles,
+    env=os.environ,
   )
 
 if __name__ == "__main__":
