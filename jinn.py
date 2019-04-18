@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Upd v{version}
+Jinn v{version}
 
 Usage:
     {program} [-d ] <profile> <path>
@@ -31,6 +31,7 @@ import yaml
 
 # third-party
 from jinnlib.dict_merge import dict_merge
+from jinnlib import __version__
 from docopt import docopt
 from toolz.dicttoolz import merge
 import colorlog
@@ -45,7 +46,6 @@ __home_dir__     = expanduser('~')           # e.g. /home/pupkin
 
 # program information
 __program__ = basename(__script_name__)      # e.g. thescript
-__version__ = '0.0.1'
 
 logger = logging.getLogger()
 
