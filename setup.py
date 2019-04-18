@@ -4,7 +4,7 @@ import sys
 from setuptools import setup
 
 setup(name='jinn',
-      version='0.1.4',
+      version='0.1.5',
       description='Jinn is a simple Jinja-based template processor. Similar to Ansible, but executes locally. Supports inheritance and extension of configs.',
       author='Slava Shvets',
       author_email='vyacheslav.shvets@t-systems.com',

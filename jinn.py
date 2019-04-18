@@ -109,7 +109,7 @@ def build_profiles(path, profile):
 
   if not result:
     raise NoProfileException('No such profile "%s" in %s' % (profile, path))
-  result = ['default'] + result
+  result = ['default'] + result + ['lock']
   logger.info("Profiles list: %s" % ','.join(result))
   return result
 
