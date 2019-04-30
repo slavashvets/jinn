@@ -76,6 +76,20 @@ class Renderer(object):
     )
 
   def render(self, **kwargs):
+    def get_list_files_function(folder):
+      def list_files(path):
+        path = pathlib.Path(folder) / path
+        if not path.is_dir() or not path.exists():
+          raise Exception("%s directory doesn't exist" % path)
+        result = []
+        for root, dirs, files in os.walk(path):
+          root = pathlib.PurePosixPath(pathlib.Path(root))
+          for f in files:
+            f = root / f
+            result.append(str(f))
+        return result
+      return list_files
+
     for root, dirs, files in os.walk(self.base_path):
       root = pathlib.PurePosixPath(pathlib.Path(root))
       for f in files:
@@ -83,9 +97,12 @@ class Renderer(object):
         template = self.env.get_template(str(template_file))
         logger.info('Processing %s' % template_file)
         output_template_path = pathlib.Path(*template_file.parts[1:])
+        template_folder = template_file.parents[0]
         output_path = pathlib.Path(self.output_path).joinpath(output_template_path)
         output_path.parents[0].mkdir(parents=True, exist_ok=True)
-        stream = template.stream(**kwargs)
+        stream = template.stream(
+          **kwargs,
+          list_files=get_list_files_function(template_folder))
         stream.dump(fp=str(output_path), errors='strict')
 
         # Inherit executable flag to the output file
@@ -137,7 +154,6 @@ def main():
   args = docopt(__doc__.format(program=__program__, version=__version__),
                 version=__version__)
   config = {}
-  profiles = None
 
   if args['<profile>']:
     try:
@@ -145,6 +161,9 @@ def main():
     except NoProfileException as e:
       logger.fatal(e)
       exit(1)
+
+    config['profiles'] = profiles
+    config['profile'] = args['<profile>']
 
     for profile in profiles:
       path = "config/%s.yaml" % profile
@@ -162,15 +181,6 @@ def main():
   def vault_wrapper(path):
     return vault_client.read(path)['data']
 
-  def list_files(path):
-    result = []
-    for root, dirs, files in os.walk(path):
-      root = pathlib.PurePosixPath(pathlib.Path(root))
-      for f in files:
-        f = root / f
-        result.append(str(f))
-    return result
-
   if args['--dump']:
     logger.info("Printing merged config values:")
     yaml.dump(config, stdout, default_flow_style=False)
@@ -179,10 +189,7 @@ def main():
   renderer = Renderer(args['<path>'], args['--output'])
   renderer.render(**config,
     vault=vault_wrapper,
-    profile=args['<profile>'],
-    profiles=profiles,
     env=os.environ,
-    list_files=list_files,
   )
 
 if __name__ == "__main__":
