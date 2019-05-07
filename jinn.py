@@ -149,6 +149,19 @@ def setup_logger():
   logger.addHandler(handler)
   logger.setLevel(logging.INFO)
 
+def dict_format(dct: dict, format_kwargs: dict):
+  """ Loop over nested dict values and format all strings.
+
+  :param dct: dict for updating
+  :param format_kwargs: key-value arguments to pass to format fuction
+  :return: None
+  """
+  for k, v in dct.items():
+    if isinstance(v, dict):
+      dict_format(v, format_kwargs)
+    elif isinstance(v, str):
+      dct[k] = v.format(**format_kwargs)
+
 def main():
   setup_logger()
   args = docopt(__doc__.format(program=__program__, version=__version__),
@@ -162,7 +175,6 @@ def main():
       logger.fatal(e)
       exit(1)
 
-    config['profiles'] = profiles
     config['profile'] = args['<profile>']
 
     for profile in profiles:
@@ -172,6 +184,10 @@ def main():
           dict_merge(config, yaml.load(stream))
       except FileNotFoundError as e:
         logger.warning("%s doesn't exist. Skip..." % path)
+    dict_format(config, {"profile": args['<profile>']})
+
+    if 'profiles' not in config.keys():
+      config['profiles'] = profiles
 
   vault_client = hvac.Client(
     url=os.environ['VAULT_ADDR'],
