@@ -32,6 +32,7 @@ import os
 import stat
 import pathlib
 import yaml
+import re
 
 # third-party
 from jinnlib.dict_merge import dict_merge
