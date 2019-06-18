@@ -184,7 +184,10 @@ def main():
           dict_merge(config, yaml.load(stream))
       except FileNotFoundError as e:
         logger.warning("%s doesn't exist. Skip..." % path)
-    dict_format(config, {"profile": args['<profile>']})
+    dict_format(config, {
+        "profile": args['<profile>'],
+        "profile_num": re.sub("\D", "", args['<profile>']),
+    })
 
     if 'profiles' not in config.keys():
       config['profiles'] = profiles
