@@ -82,6 +82,9 @@ class Renderer(object):
         path = pathlib.Path(folder) / path
         if not path.is_dir() or not path.exists():
           raise Exception("%s directory doesn't exist" % path)
+
+        raise Exception("DEBUG: Path %s" % path)
+        
         result = []
         for root, dirs, files in os.walk(path):
           root = pathlib.PurePosixPath(pathlib.Path(root))
@@ -131,7 +134,7 @@ def find_dict_keychain(d, target_key):
 
 def build_profiles(path, profile):
   with open(path, 'r') as stream:
-    p_dict = yaml.load(stream)
+    p_dict = yaml.safe_load(stream)
   result = find_dict_keychain(p_dict, profile)
 
   if not result:
@@ -182,7 +185,7 @@ def main():
       path = "config/%s.yaml" % profile
       try:
         with open(path, 'r') as stream:
-          dict_merge(config, yaml.load(stream))
+          dict_merge(config, yaml.safe_load(stream))
       except FileNotFoundError as e:
         logger.warning("%s doesn't exist. Skip..." % path)
     dict_format(config, {
