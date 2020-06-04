@@ -33,6 +33,7 @@ import stat
 import pathlib
 import yaml
 import re
+import pathspec 
 
 # third-party
 from jinnlib.dict_merge import dict_merge
@@ -53,6 +54,14 @@ __home_dir__     = expanduser('~')           # e.g. /home/pupkin
 __program__ = basename(__script_name__)      # e.g. thescript
 
 logger = logging.getLogger()
+
+def remove_prefix(path, prefix):
+    path_str = str(path)
+    prefix_str = str(prefix)
+
+    if not prefix_str.endswith('/'):
+      prefix_str += '/'
+    return path_str[len(prefix_str):] if path_str.startswith(prefix_str) else path_str
 
 def finalize(value):
   if value == None:
@@ -82,10 +91,10 @@ class Renderer(object):
         path = pathlib.Path(folder) / path
         if not path.is_dir() or not path.exists():
           raise Exception("%s directory doesn't exist" % path)
-
-        raise Exception("DEBUG: Path %s" % path)
         
         result = []
+        ignore_rules = []
+
         for root, dirs, files in os.walk(path):
           root = pathlib.PurePosixPath(pathlib.Path(root))
           for f in files:
@@ -94,9 +103,17 @@ class Renderer(object):
         return result
       return list_files
 
+    spec = False
+    if pathlib.Path(self.base_path / '.jinnignore').is_file():
+      with open(self.base_path / '.jinnignore', 'r') as fh:
+        spec = pathspec.PathSpec.from_lines('gitwildmatch', fh)
+
     for root, dirs, files in os.walk(self.base_path):
       root = pathlib.PurePosixPath(pathlib.Path(root))
       for f in files:
+        if spec and spec.match_file(remove_prefix(root / f, self.base_path)):
+          continue
+
         template_file = root / f
         template = self.env.get_template(str(template_file))
         logger.info('Processing %s' % template_file)
@@ -216,4 +233,4 @@ def main():
   )
 
 if __name__ == "__main__":
-  main()
+  main()  
