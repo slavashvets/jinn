@@ -91,10 +91,7 @@ class Renderer(object):
         path = pathlib.Path(folder) / path
         if not path.is_dir() or not path.exists():
           raise Exception("%s directory doesn't exist" % path)
-        
         result = []
-        ignore_rules = []
-
         for root, dirs, files in os.walk(path):
           root = pathlib.PurePosixPath(pathlib.Path(root))
           for f in files:
@@ -103,7 +100,7 @@ class Renderer(object):
         return result
       return list_files
 
-    spec = False
+    spec = None
     if pathlib.Path(self.base_path / '.jinnignore').is_file():
       with open(self.base_path / '.jinnignore', 'r') as fh:
         spec = pathspec.PathSpec.from_lines('gitwildmatch', fh)
@@ -111,6 +108,7 @@ class Renderer(object):
     for root, dirs, files in os.walk(self.base_path):
       root = pathlib.PurePosixPath(pathlib.Path(root))
       for f in files:
+        # If .jinnignore file found and filepath matches expressions then we will ignore file
         if spec and spec.match_file(remove_prefix(root / f, self.base_path)):
           continue
 
@@ -233,4 +231,4 @@ def main():
   )
 
 if __name__ == "__main__":
-  main()  
+  main()
