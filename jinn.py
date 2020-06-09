@@ -33,6 +33,7 @@ import stat
 import pathlib
 import yaml
 import re
+import pathspec 
 
 # third-party
 from jinnlib.dict_merge import dict_merge
@@ -53,6 +54,14 @@ __home_dir__     = expanduser('~')           # e.g. /home/pupkin
 __program__ = basename(__script_name__)      # e.g. thescript
 
 logger = logging.getLogger()
+
+def remove_prefix(path, prefix):
+    path_str = str(path)
+    prefix_str = str(prefix)
+
+    if not prefix_str.endswith('/'):
+      prefix_str += '/'
+    return path_str[len(prefix_str):] if path_str.startswith(prefix_str) else path_str
 
 def finalize(value):
   if value == None:
@@ -91,9 +100,18 @@ class Renderer(object):
         return result
       return list_files
 
+    spec = None
+    if pathlib.Path(self.base_path / '.jinnignore').is_file():
+      with open(self.base_path / '.jinnignore', 'r') as fh:
+        spec = pathspec.PathSpec.from_lines('gitwildmatch', fh)
+
     for root, dirs, files in os.walk(self.base_path):
       root = pathlib.PurePosixPath(pathlib.Path(root))
       for f in files:
+        # If .jinnignore file found and filepath matches expressions then we will ignore file
+        if spec and spec.match_file(remove_prefix(root / f, self.base_path)):
+          continue
+
         template_file = root / f
         template = self.env.get_template(str(template_file))
         logger.info('Processing %s' % template_file)
@@ -131,7 +149,7 @@ def find_dict_keychain(d, target_key):
 
 def build_profiles(path, profile):
   with open(path, 'r') as stream:
-    p_dict = yaml.load(stream)
+    p_dict = yaml.safe_load(stream)
   result = find_dict_keychain(p_dict, profile)
 
   if not result:
@@ -182,7 +200,7 @@ def main():
       path = "config/%s.yaml" % profile
       try:
         with open(path, 'r') as stream:
-          dict_merge(config, yaml.load(stream))
+          dict_merge(config, yaml.safe_load(stream))
       except FileNotFoundError as e:
         logger.warning("%s doesn't exist. Skip..." % path)
     dict_format(config, {
