@@ -2,7 +2,7 @@ Jinn is a simple Jinja-based template processor. Similar to Ansible, but execute
 
 Usage:
 
-====
+----
 Jinn v0.2.6
 
 Usage:
@@ -18,4 +18,4 @@ Options:
     -d, --dump                   Dump merged YAML to review values
     -j FILE, --json FILE         Dump merged JSON to review values
     -h, --help                   Show this screen and exit
-====
+----
