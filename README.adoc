@@ -1,0 +1,21 @@
+Jinn is a simple Jinja-based template processor. Similar to Ansible, but executes locally. Supports inheritance and extension of configs.
+
+Usage:
+
+====
+Jinn v0.2.6
+
+Usage:
+    jinn.py [-o DIR] <path>
+    jinn.py [-d ] [-j FILE] [-n] [-o DIR] <profile> <path>
+    jinn.py (-h | --help)
+
+Options:
+    <profile>                    Profile name
+    <path>                       Path to base folder
+    -o DIR, --output DIR         Output directory
+    -n, --no-extra               Don't include extra information, like profiles
+    -d, --dump                   Dump merged YAML to review values
+    -j FILE, --json FILE         Dump merged JSON to review values
+    -h, --help                   Show this screen and exit
+====
